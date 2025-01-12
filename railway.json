@@ -1,0 +1,8 @@
+{
+  "services": {
+    "default": {
+      "type": "compose",
+      "path": "."
+    }
+  }
+}

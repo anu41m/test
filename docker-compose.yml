@@ -1,40 +1,28 @@
 version: '3.9'
 
-networks:
-  Airflow_custom_network:
-    driver: bridge
-
 services:
   spark-master:
-    image: anoopm2801/spark-cluster:version-1.0.0  # Replace with your Docker Hub image
+    build:
+      context: ./Spark-master
     container_name: spark-master
-    networks:
-      - Airflow_custom_network
-    ports:
-      - "8888:8888"  # Jupyter Notebook
-      - "7077:7077"  # Spark Master RPC Port
-      - "8080:8080"  # Master Web UI (adjusted from 8082 to match standard config)
     environment:
-      - SPARK_MASTER_HOST=spark-master
-      - SPARK_MASTER_URL=spark://spark-master:7077
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 30s
-      retries: 3
-      start_period: 10s
-      timeout: 10s
-
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_URL: spark://spark-master:7077
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+      - "8888:8888"
+  
   spark-worker:
-    image: anoopm2801/spark-worker:version-1.0.0  # Replace with your Docker Hub image
-    networks:
-      - Airflow_custom_network
-    depends_on:
-      spark-master:
-        condition: service_healthy
+    build:
+      context: ./Spark-worker
+    container_name: spark-worker
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
-      - SPARK_WORKER_CORES=2
-      - SPARK_WORKER_MEMORY=1G
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_CORES: "2"
+      SPARK_WORKER_MEMORY: "1G"
+    depends_on:
+      - spark-master
     ports:
-      - "8081:8081"  # Worker Web UI
-      - "7337:7337"  # Worker Communication Port
+      - "8081:8081"
+      - "7337:7337"
