@@ -1,0 +1,12 @@
+{
+  "services": {
+    "spark-master": {
+      "type": "docker",
+      "path": "./Spark-master"
+    },
+    "spark-worker": {
+      "type": "docker",
+      "path": "./Spark-worker"
+    }
+  }
+}
